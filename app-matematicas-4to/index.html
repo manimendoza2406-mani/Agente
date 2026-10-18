@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mate 4.º Parcial 4</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Fredoka:wght@500;600;700&display=swap">
+<style>
+/* Layout: hoja de cuaderno cuadriculado (claro) o pizarra (oscuro); una columna central; tarjetas solo para la pregunta y los juegos */
+:root {
+  --paper: #f7fafd; --grid: #dfe8f1; --margin: #e98479; --ink: #1c2945; --muted: #56637f;
+  --card: #ffffff; --line: #c8d5e4; --accent: #2457c5; --accent-ink: #ffffff;
+  --pencil: #f4b400; --pencil-ink: #3b2b00;
+  --ok: #1d8049; --ok-bg: #e2f4e9; --bad: #c2352d; --bad-bg: #fbe5e3; --hint-bg: #fff4cf; --hint-ink: #4d3b00;
+  --u-masa: #0d827b; --u-tiempo: #2457c5; --u-datos: #8239ad; --u-dinero: #2c7d2c;
+  --cell: #ffffff; --cell-fixed: #2457c5; --cell-user: #f4b400; --cell-ok: #1d8049;
+  --f-display: "Fredoka", "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --f-body: "Andika", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #16211c; --grid: #22312a; --margin: #8a4741; --ink: #eef3ea; --muted: #a9b9ae;
+    --card: #1e2c25; --line: #34473d; --accent: #82b2ff; --accent-ink: #0c1830;
+    --pencil: #ffd34d; --pencil-ink: #2b2000;
+    --ok: #63d692; --ok-bg: #173424; --bad: #ff8d84; --bad-bg: #3a1f1c; --hint-bg: #39331a; --hint-ink: #ffe9a3;
+    --u-masa: #45d0c5; --u-tiempo: #82b2ff; --u-datos: #cc9ef2; --u-dinero: #83d783;
+    --cell: #24352d; --cell-fixed: #82b2ff; --cell-user: #ffd34d; --cell-ok: #63d692;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #16211c; --grid: #22312a; --margin: #8a4741; --ink: #eef3ea; --muted: #a9b9ae;
+  --card: #1e2c25; --line: #34473d; --accent: #82b2ff; --accent-ink: #0c1830;
+  --pencil: #ffd34d; --pencil-ink: #2b2000;
+  --ok: #63d692; --ok-bg: #173424; --bad: #ff8d84; --bad-bg: #3a1f1c; --hint-bg: #39331a; --hint-ink: #ffe9a3;
+  --u-masa: #45d0c5; --u-tiempo: #82b2ff; --u-datos: #cc9ef2; --u-dinero: #83d783;
+  --cell: #24352d; --cell-fixed: #82b2ff; --cell-user: #ffd34d; --cell-ok: #63d692;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { min-height: 100%; }
+body {
+  margin: 0; color: var(--ink); font-family: var(--f-body); font-size: 17px; line-height: 1.5;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+.wrap {
+  max-width: 920px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 18px 40px;
+}
+h1, h2, h3, .display { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--pencil); outline-offset: 2px; }
+
+/* Encabezado */
+.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px;
+  border-bottom: 3px double var(--margin); padding-bottom: 12px; }
+.brand .eyebrow { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.brand h1 { font-size: clamp(30px, 6vw, 44px); line-height: 1.05; font-weight: 700; }
+.brand h1 .num { display: inline-grid; place-items: center; background: var(--margin); color: var(--card);
+  border-radius: 50%; width: 1.25em; height: 1.25em; font-size: .8em; vertical-align: .08em; margin-left: .15em; }
+.brand p { margin: 4px 0 0; color: var(--muted); }
+.tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.starbank { font-family: var(--f-display); font-weight: 600; font-size: 20px; padding: 6px 14px; border-radius: 999px;
+  background: var(--pencil); color: var(--pencil-ink); font-variant-numeric: tabular-nums; }
+.ghost { background: transparent; border: 2px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 15px; }
+.ghost:hover { border-color: var(--accent); }
+
+/* Juegos */
+.sec-title { display: flex; align-items: baseline; gap: 10px; margin: 28px 0 12px; }
+.sec-title h2 { font-size: 24px; }
+.sec-title span { color: var(--muted); font-size: 15px; }
+.games { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.game { text-align: left; background: var(--card); border: 2px solid var(--line); border-radius: 18px; padding: 16px;
+  display: grid; gap: 6px; transition: transform .15s ease, border-color .15s ease; }
+.game:hover { transform: translateY(-3px); border-color: var(--gc, var(--accent)); }
+.game .g-ico { font-size: 34px; line-height: 1; }
+.game h3 { font-size: 20px; color: var(--gc, var(--accent)); }
+.game p { margin: 0; color: var(--muted); font-size: 15px; }
+.game .g-stars { font-size: 14px; color: var(--muted); }
+
+/* Lecciones */
+.units { display: grid; gap: 22px; }
+.unit h3 { font-size: 19px; color: var(--uc); display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.unit h3::before { content: ""; width: 12px; height: 12px; border-radius: 3px; background: var(--uc); }
+.lessons { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.lesson { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; text-align: left;
+  background: color-mix(in srgb, var(--card) 88%, transparent); border: 2px solid transparent; border-radius: 14px; padding: 10px 12px; }
+.lesson:hover { border-color: var(--uc); }
+.lesson .badge { font-family: var(--f-display); font-weight: 700; width: 40px; height: 40px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--uc); color: var(--card); font-size: 17px; }
+.lesson .ln { font-weight: 700; line-height: 1.25; }
+.lesson .pg { font-size: 13px; color: var(--muted); }
+.lesson .ls { font-size: 15px; letter-spacing: 1px; color: var(--pencil); white-space: nowrap; }
+.lesson .ls .off { color: var(--line); }
+.rules { margin-top: 30px; padding: 14px 16px; border-left: 4px solid var(--margin); background: var(--card); border-radius: 0 12px 12px 0;
+  color: var(--muted); font-size: 15px; max-width: 65ch; }
+.rules b { color: var(--ink); }
+
+/* Juego en curso */
+.playbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.playbar .pl-title { font-family: var(--f-display); font-weight: 600; font-size: 20px; flex: 1; min-width: 0; }
+.playbar .pl-count { font-variant-numeric: tabular-nums; color: var(--muted); }
+.progress { height: 10px; background: var(--card); border: 2px solid var(--line); border-radius: 999px; margin: 12px 0 16px; overflow: hidden; }
+.progress > div { height: 100%; width: 0; background: var(--pencil); transition: width .3s ease; }
+.qcard { background: var(--card); border: 2px solid var(--line); border-radius: 22px; padding: clamp(16px, 4vw, 28px); display: grid; gap: 16px; }
+.q-tag { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.q-body { font-size: 20px; min-width: 0; }
+.q-body p { margin: 0 0 10px; }
+.q-body .big { font-family: var(--f-display); font-size: 28px; font-weight: 600; }
+.figure { display: flex; justify-content: center; flex-wrap: wrap; gap: 14px; margin: 8px 0; }
+.figure svg { max-width: 100%; height: auto; }
+
+.numrow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 22px; font-family: var(--f-display); }
+.numrow input { width: 9ch; font: inherit; font-size: 26px; padding: 8px 12px; border-radius: 12px; border: 3px solid var(--line);
+  background: var(--paper); color: var(--ink); text-align: center; font-variant-numeric: tabular-nums; }
+.numrow input.short { width: 3.4ch; }
+.numrow input:focus { border-color: var(--accent); outline: none; }
+.opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.opt { background: var(--paper); border: 3px solid var(--line); border-radius: 14px; padding: 12px; font-size: 18px; min-height: 56px;
+  display: flex; align-items: center; justify-content: center; gap: 8px; text-align: center; transition: border-color .15s ease; }
+.opt:hover { border-color: var(--accent); }
+.opt.wrong { animation: shake .35s; border-color: var(--bad); }
+.opt.right { border-color: var(--ok); background: var(--ok-bg); }
+.opt .letter { font-family: var(--f-display); font-size: 40px; font-weight: 700; }
+@keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+.tries { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; color: var(--muted); font-size: 15px; }
+.tries .dots { display: flex; gap: 6px; }
+.tries .dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line); background: var(--paper); }
+.tries .dot.used { background: var(--bad); border-color: var(--bad); }
+.tries .dot.win { background: var(--ok); border-color: var(--ok); }
+.feedback:empty { display: none; }
+.feedback { padding: 10px 14px; border-radius: 12px; font-weight: 700; }
+.feedback.ok { background: var(--ok-bg); color: var(--ok); }
+.feedback.bad { background: var(--bad-bg); color: var(--bad); }
+.feedback.info { background: var(--paper); color: var(--muted); }
+.hint { background: var(--hint-bg); color: var(--hint-ink); padding: 10px 14px; border-radius: 12px; }
+.hint ul { margin: 4px 0 0; padding-left: 20px; }
+.reveal { border: 2px dashed var(--accent); border-radius: 14px; padding: 12px 14px; }
+.reveal .ans { font-family: var(--f-display); font-size: 24px; font-weight: 700; color: var(--accent); }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn { border: 0; border-radius: 14px; padding: 12px 22px; font-family: var(--f-display); font-weight: 600; font-size: 19px;
+  background: var(--accent); color: var(--accent-ink); }
+.btn.alt { background: var(--pencil); color: var(--pencil-ink); }
+.btn.plain { background: transparent; border: 2px solid var(--line); color: var(--ink); }
+.btn:disabled { opacity: .5; cursor: default; }
+
+/* Dibujos */
+.svg-ink { stroke: var(--ink); }
+.svg-fill-card { fill: var(--card); }
+.svg-text { fill: var(--ink); font-family: var(--f-display); }
+.money { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; }
+.bill { width: 92px; height: 48px; border-radius: 6px; display: grid; place-items: center; font-family: var(--f-display); font-weight: 700;
+  font-size: 18px; color: #1d2a1d; border: 2px solid rgba(0,0,0,.25); box-shadow: inset 0 0 0 4px rgba(255,255,255,.35); }
+.coin { width: 50px; height: 50px; border-radius: 50%; display: grid; place-items: center; font-family: var(--f-display); font-weight: 700;
+  font-size: 15px; line-height: 1; color: #3a2e10; background: #d9c27a; border: 3px solid #b39a4b; text-align: center; }
+.coin small { display: block; font-size: 9px; font-weight: 600; }
+.cal { border-collapse: collapse; font-variant-numeric: tabular-nums; margin: 0 auto; background: var(--card); }
+.cal caption { font-family: var(--f-display); font-weight: 600; font-size: 20px; padding-bottom: 6px; text-transform: capitalize; }
+.cal th, .cal td { width: 40px; height: 34px; text-align: center; border: 1px solid var(--line); font-size: 16px; }
+.cal th { font-size: 13px; color: var(--muted); text-transform: uppercase; }
+.cal td.mark { background: var(--pencil); color: var(--pencil-ink); font-weight: 700; }
+.scroll { overflow-x: auto; max-width: 100%; }
+.items { display: flex; flex-wrap: wrap; gap: 6px; font-size: 30px; justify-content: center; max-width: 520px; margin: 0 auto;
+  padding: 10px; border: 2px dashed var(--line); border-radius: 14px; }
+table.data { border-collapse: collapse; margin: 0 auto; background: var(--card); }
+table.data th, table.data td { border: 1px solid var(--line); padding: 6px 12px; text-align: left; font-size: 17px; }
+table.data th { font-family: var(--f-display); font-weight: 600; }
+table.data td.ic { font-size: 26px; letter-spacing: 2px; }
+.key { text-align: center; font-size: 16px; color: var(--muted); margin-top: 6px; }
+.scale { display: flex; align-items: flex-end; justify-content: center; gap: 0; }
+.plate { min-width: 110px; padding: 6px 10px; border-bottom: 5px solid var(--ink); text-align: center; font-size: 30px; }
+.fulcrum { width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-bottom: 34px solid var(--muted); }
+.mgrid { display: grid; gap: 3px; margin: 0 auto; width: max-content; max-width: 100%; position: relative; touch-action: manipulation; }
+.mgrid button { width: 38px; height: 38px; border-radius: 6px; border: 2px solid var(--line); background: var(--cell); padding: 0; }
+.mgrid button.fixed { background: var(--cell-fixed); border-color: var(--cell-fixed); cursor: default; }
+.mgrid button.on { background: var(--cell-user); border-color: var(--cell-user); }
+.mgrid button.sol { background: var(--cell-ok); border-color: var(--cell-ok); }
+.mgrid button.locked { cursor: default; }
+.mgrid .axis { position: absolute; background: var(--margin); pointer-events: none; border-radius: 3px; }
+@media (max-width: 420px) { .mgrid button { width: 33px; height: 33px; } .opt .letter { font-size: 32px; } }
+
+/* Resultado */
+.result { text-align: center; display: grid; gap: 14px; justify-items: center; }
+.result .stars-big { font-size: 46px; color: var(--pencil); letter-spacing: 6px; }
+.result .stars-big .off { color: var(--line); }
+.summary { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.summary span { padding: 4px 10px; border-radius: 999px; font-size: 14px; background: var(--paper); border: 2px solid var(--line); }
+.summary span.r { border-color: var(--bad); color: var(--bad); }
+
+canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+@media (prefers-reduced-motion: reduce) {
+  .game, .progress > div, .opt { transition: none; }
+  .opt.wrong { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="confetti" width="10" height="10" aria-hidden="true"></canvas>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="eyebrow">Matemáticas · Cuarto grado</div>
+      <h1>Parcial <span class="num">4</span></h1>
+      <p>Midiendo y comprendiendo el mundo · lecciones 63 a 80</p>
+    </div>
+    <div class="tools">
+      <button class="ghost" id="btn-sound" type="button" aria-pressed="true">Sonido: sí</button>
+      <div class="starbank" id="starbank" title="Estrellas ganadas">★ 0</div>
+    </div>
+  </header>
+
+  <main id="home">
+    <div class="sec-title"><h2>Juegos</h2><span>Mezclan varios temas</span></div>
+    <div class="games" id="games"></div>
+    <div class="sec-title"><h2>Lecciones</h2><span>5 preguntas por lección</span></div>
+    <div class="units" id="units"></div>
+    <div class="rules">
+      <b>¿Cómo se juega?</b> Cada pregunta tiene <b>6 intentos</b>. En el intento 2 y en el 4 aparece una pista.
+      La respuesta correcta solo se muestra después del sexto intento fallido.
+      Ganas ★★★ si aciertas al primer intento, ★★ en el segundo o tercero y ★ del cuarto al sexto.
+    </div>
+  </main>
+
+  <section id="play" hidden>
+    <div class="playbar">
+      <button class="ghost" id="btn-exit" type="button">← Salir</button>
+      <div class="pl-title" id="pl-title"></div>
+      <div class="pl-count" id="pl-count"></div>
+    </div>
+    <div class="progress"><div id="pl-prog"></div></div>
+    <article class="qcard">
+      <div class="q-tag" id="q-tag"></div>
+      <div class="q-body" id="q-body"></div>
+      <div id="q-answer"></div>
+      <div class="tries"><span id="tries-label">Intento 1 de 6</span><span class="dots" id="dots"></span></div>
+      <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+      <div class="hint" id="hint" hidden></div>
+      <div class="reveal" id="reveal" hidden></div>
+      <div class="actions">
+        <button class="btn" id="btn-check" type="button">Comprobar</button>
+        <button class="btn plain" id="btn-clear" type="button" hidden>Borrar</button>
+        <button class="btn alt" id="btn-next" type="button" hidden>Siguiente →</button>
+      </div>
+    </article>
+  </section>
+
+  <section id="result" hidden>
+    <article class="qcard result">
+      <h2 id="r-title">¡Terminaste!</h2>
+      <div class="stars-big" id="r-stars"></div>
+      <p id="r-text"></p>
+      <div class="summary" id="r-summary"></div>
+      <div class="actions">
+        <button class="btn alt" id="btn-again" type="button">Jugar otra vez</button>
+        <button class="btn plain" id="btn-home" type="button">Volver al inicio</button>
+      </div>
+    </article>
+  </section>
+</div>
+
+<script>
+"use strict";
+/* ===== Configuración de la moneda nacional (cámbiala si tu país usa otra) ===== */
+const CUR = { sym: "L", one: "lempira", many: "lempiras",
+  bills: [1, 2, 5, 10, 20, 50, 100, 200, 500], coins: [5, 10, 20, 50] };
+const MAX_TRIES = 6;
+
+/* ===== Utilidades ===== */
+const $ = (id) => document.getElementById(id);
+const ri = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+const shuffle = (a) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const sample = (a, n) => shuffle(a).slice(0, n);
+const pad = (n) => String(n).padStart(2, "0");
+const fmtN = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+const money = (n) => CUR.sym + " " + fmtN(Math.floor(n + 1e-9)) + "." + pad(Math.round((n - Math.floor(n + 1e-9)) * 100));
+const round2 = (n) => Math.round(n * 100) / 100;
+
+function words(n) {
+  const u = ["cero","uno","dos","tres","cuatro","cinco","seis","siete","ocho","nueve","diez","once","doce","trece","catorce","quince","dieciséis","diecisiete","dieciocho","diecinueve","veinte","veintiuno","veintidós","veintitrés","veinticuatro","veinticinco","veintiséis","veintisiete","veintiocho","veintinueve"];
+  const d = ["","","","treinta","cuarenta","cincuenta","sesenta","setenta","ochenta","noventa"];
+  const c = ["","ciento","doscientos","trescientos","cuatrocientos","quinientos","seiscientos","setecientos","ochocientos","novecientos"];
+  if (n < 30) return u[n];
+  if (n < 100) { const r = n % 10; return d[Math.floor(n / 10)] + (r ? " y " + u[r] : ""); }
+  if (n === 100) return "cien";
+  if (n < 1000) { const r = n % 100; return c[Math.floor(n / 100)] + (r ? " " + words(r) : ""); }
+  const k = Math.floor(n / 1000), r = n % 1000;
+  return (k === 1 ? "mil" : apoc(words(k)) + " mil") + (r ? " " + words(r) : "");
+}
+const apoc = (s) => s.replace(/veintiuno$/, "veintiún").replace(/uno$/, "un");
+function moneyWords(n) {
+  const l = Math.floor(n + 1e-9), c = Math.round((n - l) * 100);
+  let s = apoc(words(l)) + " " + (l === 1 ? CUR.one : CUR.many);
+  if (c) s += " con " + apoc(words(c)) + (c === 1 ? " centavo" : " centavos");
+  return s;
+}
+
+/* ===== Constructores de preguntas ===== */
+function num(html, answer, o = {}) {
+  return { type: "num", html, answer, prefix: o.prefix || "", unit: o.unit || "", hints: o.hints || [],
+    answerText: o.answerText || ((o.prefix ? o.prefix + " " : "") + (o.money ? money(answer).slice(CUR.sym.length + 1) : fmtN(answer)) + (o.unit ? " " + o.unit : "")),
+    explain: o.explain || "" };
+}
+function choice(html, options, correct, o = {}) {
+  return { type: "choice", html, options, correct, hints: o.hints || [], answerText: options[correct], explain: o.explain || "", cls: o.cls || "" };
+}
+function timeQ(html, h, m, o = {}) {
+  return { type: "time", html, answer: { h, m }, hints: o.hints || [], answerText: h + ":" + pad(m), explain: o.explain || "" };
+}
+const P = (s) => "<p>" + s + "</p>";
+const fig = (s) => '<div class="figure">' + s + "</div>";
+const mq = (n) => ({ prefix: CUR.sym, money: true, answerText: money(n) });
+
+/* ===== Dibujos ===== */
+function clockSVG(h, m) {
+  const cx = 110, cy = 110; let s = `<svg viewBox="0 0 220 220" width="220" height="220" role="img" aria-label="Reloj de agujas">`;
+  s += `<circle cx="${cx}" cy="${cy}" r="100" class="svg-fill-card svg-ink" stroke-width="5"/>`;
+  for (let i = 0; i < 60; i++) {
+    const a = i * Math.PI / 30, r1 = i % 5 ? 92 : 86;
+    s += `<line x1="${cx + r1 * Math.sin(a)}" y1="${cy - r1 * Math.cos(a)}" x2="${cx + 97 * Math.sin(a)}" y2="${cy - 97 * Math.cos(a)}" class="svg-ink" stroke-width="${i % 5 ? 1.5 : 3}"/>`;
+  }
+  for (let i = 1; i <= 12; i++) {
+    const a = i * Math.PI / 6;
+    s += `<text x="${cx + 70 * Math.sin(a)}" y="${cy - 70 * Math.cos(a) + 7}" text-anchor="middle" font-size="20" font-weight="600" class="svg-text">${i}</text>`;
+  }
+  const ha = ((h % 12) + m / 60) * Math.PI / 6, ma = m * Math.PI / 30;
+  s += `<line x1="${cx}" y1="${cy}" x2="${cx + 48 * Math.sin(ha)}" y2="${cy - 48 * Math.cos(ha)}" stroke="var(--margin)" stroke-width="8" stroke-linecap="round"/>`;
+  s += `<line x1="${cx}" y1="${cy}" x2="${cx + 78 * Math.sin(ma)}" y2="${cy - 78 * Math.cos(ma)}" stroke="var(--accent)" stroke-width="5" stroke-linecap="round"/>`;
+  s += `<circle cx="${cx}" cy="${cy}" r="7" fill="var(--ink)"/></svg>`;
+  return s;
+}
+function tallySVG(n, h = 50) {
+  const groups = Math.ceil(n / 5), w = groups * 56 + 4;
+  let s = `<svg viewBox="0 0 ${w} ${h + 10}" width="${w}" height="${h + 10}" role="img" aria-label="Conteo con palotes">`;
+  for (let g = 0; g < groups; g++) {
+    const k = Math.min(5, n - g * 5), x0 = 8 + g * 56;
+    for (let i = 0; i < Math.min(4, k); i++) s += `<line x1="${x0 + i * 10}" y1="5" x2="${x0 + i * 10}" y2="${h + 5}" class="svg-ink" stroke-width="3.5" stroke-linecap="round"/>`;
+    if (k === 5) s += `<line x1="${x0 - 6}" y1="${h - 2}" x2="${x0 + 36}" y2="12" stroke="var(--margin)" stroke-width="3.5" stroke-linecap="round"/>`;
+  }
+  return s + "</svg>";
+}
+const norm = (cells) => { const mx = Math.min(...cells.map(c => c[0])), my = Math.min(...cells.map(c => c[1])); return cells.map(([x, y]) => [x - mx, y - my]); };
+const rotR = (cells) => norm(cells.map(([x, y]) => [-y, x]));
+const mirror = (cells) => norm(cells.map(([x, y]) => [-x, y]));
+function polySVG(cells, size = 24) {
+  const w = (Math.max(...cells.map(c => c[0])) + 1) * size, h = (Math.max(...cells.map(c => c[1])) + 1) * size;
+  let s = `<svg viewBox="-3 -3 ${w + 6} ${h + 6}" width="${w + 6}" height="${h + 6}" role="img" aria-label="Figura">`;
+  cells.forEach(([x, y], i) => { s += `<rect x="${x * size}" y="${y * size}" width="${size}" height="${size}" rx="3" fill="${i === 0 ? "var(--margin)" : "var(--accent)"}" stroke="var(--card)" stroke-width="2"/>`; });
+  return s + "</svg>";
+}
+function arrowSVG(dir) {
+  const rot = [0, 90, 180, 270][dir];
+  return `<svg viewBox="0 0 60 60" width="54" height="54" role="img" aria-label="Flecha"><g transform="rotate(${rot} 30 30)"><path d="M30 6 L48 28 H37 V54 H23 V28 H12 Z" fill="var(--accent)"/></g></svg>`;
+}
+function polygonSVG(kind) {
+  const W = 150, c = 75; let pts;
+  const reg = (n, r = 62, off = -Math.PI / 2) => Array.from({ length: n }, (_, i) => [c + r * Math.cos(off + i * 2 * Math.PI / n), c + r * Math.sin(off + i * 2 * Math.PI / n)]);
+  if (kind === "cuadrado") pts = [[25, 25], [125, 25], [125, 125], [25, 125]];
+  else if (kind === "rectángulo") pts = [[10, 40], [140, 40], [140, 110], [10, 110]];
+  else if (kind === "rombo") pts = [[75, 8], [128, 75], [75, 142], [22, 75]];
+  else if (kind === "isósceles") pts = [[75, 10], [120, 140], [30, 140]];
+  else pts = reg({ "triángulo": 3, "pentágono": 5, "hexágono": 6 }[kind]);
+  return `<svg viewBox="0 0 ${W} ${W}" width="150" height="150" role="img" aria-label="Figura geométrica"><polygon points="${pts.map(p => p.map(v => v.toFixed(1)).join(",")).join(" ")}" fill="color-mix(in srgb, var(--accent) 25%, transparent)" stroke="var(--accent)" stroke-width="4" stroke-linejoin="round"/></svg>`;
+}
+const BILL_COLORS = { 1: "#f2a7a0", 2: "#c9b3e6", 5: "#9fd3c7", 10: "#e9b98a", 20: "#a8d89a", 50: "#9ec3ec", 100: "#f2d98a", 200: "#8fd1e0", 500: "#e3a2c9" };
+const billHTML = (v) => `<div class="bill" style="background:${BILL_COLORS[v] || "#cfd8cf"}">${CUR.sym} ${v}</div>`;
+const coinHTML = (c) => `<div class="coin">${c}<small>cent.</small></div>`;
+const moneyRow = (bills, coins = []) => '<div class="money">' + bills.map(billHTML).join("") + coins.map(coinHTML).join("") + "</div>";
+
+/* ===== Datos compartidos ===== */
+const DAYS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"];
+const MONTHS = [["enero", 31], ["febrero", 28], ["marzo", 31], ["abril", 30], ["mayo", 31], ["junio", 30], ["julio", 31], ["agosto", 31], ["septiembre", 30], ["octubre", 31], ["noviembre", 30], ["diciembre", 31]];
+const NAMES = ["Ana", "Luis", "Sofía", "Carlos", "María", "José", "Valeria", "Diego", "Camila", "Mateo"];
+const PRODUCTS = [["📒", "un cuaderno"], ["✏️", "un lápiz"], ["🧃", "un jugo"], ["🍞", "una bolsa de pan"], ["⚽", "una pelota"], ["🎒", "una mochila"], ["🧸", "un peluche"], ["🖍️", "una caja de crayones"], ["📏", "una regla"], ["🧢", "una gorra"], ["🍦", "un helado"], ["🥤", "un refresco"]];
+const price = (a, b) => round2(ri(a, b) + pick([0, 0.25, 0.5, 0.75]));
+
+/* ===== Lección 63 · Masa ===== */
+const L63 = [
+  () => {
+    const items = [["✏️", "un lápiz", 8], ["📒", "un cuaderno", 250], ["🍎", "una manzana", 150], ["🍉", "una sandía", 4000], ["🐱", "un gato", 4500], ["🐕", "un perro grande", 25000], ["🧒", "un niño", 30000], ["🚗", "un carro", 1200000], ["🐘", "un elefante", 5000000], ["🍍", "una piña", 1500], ["🪶", "una pluma de ave", 1], ["📕", "un libro", 600], ["🥚", "un huevo", 60], ["🐄", "una vaca", 600000]];
+    let s; do { s = sample(items, 4).sort((a, b) => a[2] - b[2]); } while (s.some((x, i) => i && x[2] < s[i - 1][2] * 1.8));
+    const most = Math.random() < .5, target = most ? s[3] : s[0];
+    const opts = s.map(x => x[0] + " " + x[1]);
+    return choice(P(`¿Cuál de estos tiene <b>${most ? "más" : "menos"} masa</b>?`), opts, s.indexOf(target),
+      { hints: ["La masa es la cantidad de materia: lo que sentirías al cargarlo.", "Imagina cada objeto en una balanza. ¿Cuál la bajaría " + (most ? "más" : "menos") + "?"] });
+  },
+  () => {
+    const groups = { g: ["una galleta", "un borrador", "una hoja de papel", "un lápiz", "una cuchara"], kg: ["un niño", "un perro", "un saco de frijoles", "una sandía", "una bicicleta"], t: ["un camión", "un elefante", "un barco", "una ballena", "un bus"] };
+    const k = pick(["g", "kg", "t"]), obj = pick(groups[k]);
+    const opts = ["gramos (g)", "kilogramos (kg)", "toneladas (t)"];
+    return choice(P(`¿Qué unidad es mejor para medir la masa de <b>${obj}</b>?`), opts, ["g", "kg", "t"].indexOf(k),
+      { hints: ["El gramo se usa para cosas livianas; la tonelada para cosas muy pesadas.", "1 tonelada = 1 000 kg y 1 kg = 1 000 g."] });
+  },
+  () => {
+    const pair = pick([["🍎", "manzanas", "🍍", "una piña"], ["🥚", "huevos", "🥭", "un mango grande"], ["🍋", "limones", "🥥", "un coco"], ["🧱", "bloques", "🎃", "una calabaza"]]);
+    const n = ri(2, 5), m = pick([50, 100, 150, 200, 250]);
+    return num(P(`La balanza está en equilibrio. Cada uno de los ${pair[1]} tiene una masa de <b>${m} g</b>. ¿Cuál es la masa de ${pair[3]}?`) +
+      fig(`<div class="scale"><div class="plate">${pair[0].repeat(n)}</div><div class="fulcrum"></div><div class="plate">${pair[2]}</div></div>`),
+      n * m, { unit: "g", hints: ["Si la balanza está en equilibrio, los dos lados tienen la misma masa.", `Suma ${m} g ${n} veces, o multiplica ${n} × ${m}.`] });
+  }
+];
+/* ===== Lección 64 · Sistema métrico ===== */
+const H64 = ["Recuerda: 1 kg = 1 000 g.", "Para pasar de kg a g multiplica por 1 000; de g a kg divide entre 1 000."];
+const L64 = [
+  () => { const a = ri(2, 9); return num(P(`<span class="big">${a} kg = ? g</span>`), a * 1000, { unit: "g", hints: H64 }); },
+  () => { const a = ri(2, 9); return num(P(`<span class="big">${fmtN(a * 1000)} g = ? kg</span>`), a, { unit: "kg", hints: H64 }); },
+  () => { const a = ri(1, 5), b = pick([125, 250, 300, 500, 600, 750]); return num(P(`<span class="big">${a} kg y ${b} g = ? g</span>`), a * 1000 + b, { unit: "g", hints: ["Primero convierte los kilogramos a gramos.", "Después suma los gramos que sobran."] }); },
+  () => { const f = pick([["½ kg", 500], ["¼ kg", 250], ["¾ kg", 750]]); return num(P(`¿Cuántos gramos hay en <span class="big">${f[0]}</span>?`), f[1], { unit: "g", hints: ["1 kg = 1 000 g.", "½ es la mitad; ¼ es la cuarta parte de 1 000."] }); },
+  () => { const a = ri(2, 8); return num(P(`Un camión carga <b>${a} toneladas</b> de arena. ¿Cuántos kilogramos son?`), a * 1000, { unit: "kg", hints: ["1 tonelada = 1 000 kg.", `Multiplica ${a} × 1 000.`] }); },
+  () => { const who = pick(NAMES), a = ri(2, 4), b = pick([250, 500, 750]); return num(P(`${who} compró una bolsa de arroz de <b>${a} kg</b> y usó <b>${b} g</b> para el almuerzo. ¿Cuántos gramos de arroz quedan?`), a * 1000 - b, { unit: "g", hints: H64.slice(0, 1).concat([`Convierte ${a} kg a gramos y luego resta ${b} g.`]) }); }
+];
+/* ===== Lección 65 · Sistema inglés ===== */
+const H65 = ["1 libra (lb) = 16 onzas (oz).", "1 arroba = 25 libras y 1 quintal = 100 libras."];
+const L65 = [
+  () => { const a = ri(2, 6); return num(P(`<span class="big">${a} lb = ? oz</span>`), a * 16, { unit: "oz", hints: H65 }); },
+  () => { const a = ri(2, 5); return num(P(`<span class="big">${a * 16} oz = ? lb</span>`), a, { unit: "lb", hints: [H65[0], "Divide las onzas entre 16."] }); },
+  () => { const a = ri(2, 4); return num(P(`Don Pedro vende <b>${a} arrobas</b> de maíz. ¿Cuántas libras son?`), a * 25, { unit: "lb", hints: H65.slice().reverse() }); },
+  () => { const a = ri(1, 5); return num(P(`En la bodega hay <b>${a} quintal${a > 1 ? "es" : ""}</b> de frijoles. ¿Cuántas libras son?`), a * 100, { unit: "lb", hints: H65.slice().reverse() }); },
+  () => {
+    const a = ri(1, 4), b = a * 16 + pick([-8, 0, 8, -4, 4]);
+    const opts = [`${a} libra${a > 1 ? "s" : ""}`, `${b} onzas`, "Tienen la misma masa"];
+    const c = b < a * 16 ? 0 : b > a * 16 ? 1 : 2;
+    return choice(P(`¿Qué tiene más masa: <b>${a} lb</b> de queso o <b>${b} oz</b> de queso?`), opts, c, { hints: [H65[0], `Convierte ${a} lb a onzas y compara.`] });
+  }
+];
+/* ===== Lección 66 · Figuras simétricas ===== */
+function mirrorGridQ() {
+  const vertical = Math.random() < .5;
+  const cols = vertical ? 8 : 6, rows = vertical ? 6 : 8;
+  const fixed = new Set(), target = ri(6, 9);
+  let x = vertical ? 3 : ri(1, 4), y = vertical ? ri(1, 4) : 3;
+  fixed.add(x + "," + y);
+  let guard = 0;
+  while (fixed.size < target && guard++ < 500) {
+    const [dx, dy] = pick([[1, 0], [-1, 0], [0, 1], [0, -1]]);
+    const nx = x + dx, ny = y + dy;
+    if (nx < 0 || ny < 0 || (vertical ? nx > 3 || ny >= rows : ny > 3 || nx >= cols)) continue;
+    x = nx; y = ny; fixed.add(x + "," + y);
+  }
+  const answer = new Set([...fixed].map(k => { const [a, b] = k.split(",").map(Number); return vertical ? (7 - a) + "," + b : a + "," + (7 - b); }));
+  return { type: "grid", html: P(`Pinta los cuadros para que la figura sea <b>simétrica</b> respecto a la línea roja. Toca un cuadro para pintarlo o borrarlo.`),
+    cols, rows, vertical, fixed, answer, hints: ["Cada cuadro azul tiene su gemelo al otro lado del espejo, a la misma distancia de la línea roja.", "Cuenta cuántos cuadros hay entre cada cuadro azul y la línea, y pinta a la misma distancia del otro lado."],
+    answerText: "Así queda la figura completa (cuadros verdes).", explain: "" };
+}
+const L66 = [
+  mirrorGridQ, mirrorGridQ,
+  () => {
+    const sym = ["A", "H", "M", "O", "T", "U", "V", "W", "X", "Y", "I"], non = ["F", "G", "J", "L", "N", "P", "Q", "R", "S", "Z"];
+    const opts = [pick(sym), ...sample(non, 4)].map(l => `<span class="letter">${l}</span>`);
+    return choice(P("¿Cuál de estas letras tiene un <b>eje de simetría</b>?"), opts, 0, { hints: ["Un eje de simetría divide la figura en dos partes iguales, como un espejo.", "Imagina doblar cada letra por la mitad. ¿En cuál coinciden las dos partes?"] });
+  },
+  () => {
+    const s = pick([["cuadrado", "un cuadrado", 4], ["rectángulo", "un rectángulo", 2], ["triángulo", "un triángulo equilátero", 3], ["hexágono", "un hexágono regular", 6], ["pentágono", "un pentágono regular", 5], ["rombo", "un rombo", 2], ["isósceles", "un triángulo isósceles", 1]]);
+    return num(P(`¿Cuántos ejes de simetría tiene <b>${s[1]}</b>?`) + fig(polygonSVG(s[0])), s[2], { unit: "ejes", hints: ["Busca líneas que dividan la figura en dos mitades que coincidan al doblarla.", "Prueba con líneas que pasen por las esquinas y por la mitad de los lados."] });
+  }
+];
+/* ===== Lección 67 · Rotaciones ===== */
+const SHAPES = [[[0, 0], [0, 1], [0, 2], [1, 2]], [[1, 0], [2, 0], [0, 1], [1, 1], [1, 2]], [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2]], [[0, 0], [1, 0], [2, 0], [2, 1]]];
+const TURNS = [["¼ de vuelta a la derecha (90°)", 1], ["½ vuelta (180°)", 2], ["¼ de vuelta a la izquierda (90°)", 3]];
+const L67 = [
+  () => {
+    const base = norm(pick(SHAPES)), t = pick(TURNS);
+    const r1 = rotR(base), r2 = rotR(r1), r3 = rotR(r2), m = mirror(base);
+    const opts = [r1, r2, r3, m, rotR(m), rotR(rotR(m))].map(c => polySVG(c, 20));
+    return choice(P(`Gira esta figura <b>${t[0]}</b>. ¿Cuál es el resultado?`) + fig(polySVG(base, 28)), opts, t[1] - 1,
+      { hints: ["Fíjate en el cuadro rojo: debe quedar en el lugar correcto después de girar.", "Gira la hoja (o tu cabeza) en la misma dirección y compara."] });
+  },
+  () => { const f = pick([["¼ de vuelta", 90], ["½ vuelta", 180], ["¾ de vuelta", 270], ["una vuelta completa", 360]]); return num(P(`¿Cuántos grados gira una figura que da <b>${f[0]}</b>?`), f[1], { unit: "°", hints: ["Una vuelta completa mide 360°.", "Divide 360° en partes iguales: ½ es la mitad y ¼ es la cuarta parte."] }); },
+  () => {
+    const names = ["arriba", "la derecha", "abajo", "la izquierda"], d = ri(0, 3), t = pick(TURNS);
+    const opts = [0, 1, 2, 3].map(i => arrowSVG(i) + "<span>" + names[i] + "</span>");
+    return choice(P(`Esta flecha apunta hacia <b>${names[d]}</b>. Si gira <b>${t[0]}</b>, ¿hacia dónde apuntará?`) + fig(arrowSVG(d)), opts, (d + t[1]) % 4,
+      { hints: ["A la derecha es el mismo sentido en que giran las agujas del reloj.", "¼ de vuelta mueve la flecha a la posición vecina; ½ vuelta la deja al lado contrario."] });
+  }
+];
+/* ===== Lección 68 · Calendario ===== */
+function calendarHTML(mi, start, mark) {
+  const [name, days] = MONTHS[mi];
+  let s = `<div class="scroll"><table class="cal"><caption>${name}</caption><tr>${DAYS.map(d => `<th>${d.slice(0, 2)}</th>`).join("")}</tr><tr>`;
+  for (let i = 0; i < start; i++) s += "<td></td>";
+  for (let d = 1; d <= days; d++) { s += `<td${d === mark ? ' class="mark"' : ""}>${d}</td>`; if ((start + d) % 7 === 0 && d < days) s += "</tr><tr>"; }
+  return s + "</tr></table></div>";
+}
+const L68 = [
+  () => {
+    const mi = pick([0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]), start = ri(0, 6), days = MONTHS[mi][1];
+    const d0 = ri(1, days - 12), k = pick([7, 9, 10, 12, 5, 8]), d = d0 + k;
+    return choice(P(`Hoy es <b>${d0} de ${MONTHS[mi][0]}</b>. ¿Qué día de la semana será dentro de <b>${k} días</b>?`) + fig(calendarHTML(mi, start, d0)),
+      DAYS.slice(), (start + d - 1) % 7, { hints: [`Suma ${d0} + ${k} para saber la fecha.`, "Busca esa fecha en el calendario y mira la columna."] });
+  },
+  () => {
+    const mi = pick([0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    return num(P(`¿Cuántos días tiene el mes de <b>${MONTHS[mi][0]}</b>?`), MONTHS[mi][1], { unit: "días", hints: ["Usa los nudillos de tu mano: los meses en nudillo tienen 31 días.", "Abril, junio, septiembre y noviembre tienen 30 días."] });
+  },
+  () => { const n = ri(2, 8); return num(P(`Las vacaciones de ${pick(NAMES)} duran <b>${n} semanas</b>. ¿Cuántos días son?`), n * 7, { unit: "días", hints: ["Una semana tiene 7 días.", `Multiplica ${n} × 7.`] }); },
+  () => {
+    const m = ri(0, 11), k = ri(2, 6), ans = (m + k) % 12;
+    const pool = [ans, ...sample([...Array(12).keys()].filter(i => i !== ans), 5)].sort((a, b) => a - b);
+    return choice(P(`Estamos en <b>${MONTHS[m][0]}</b>. ¿Qué mes será dentro de <b>${k} meses</b>?`), pool.map(i => MONTHS[i][0]), pool.indexOf(ans),
+      { hints: ["Cuenta los meses uno por uno a partir del siguiente.", "Después de diciembre vuelve a empezar enero."] });
+  }
+];
+/* ===== Lección 69 · Mediciones del día ===== */
+const L69 = [
+  () => { const a = ri(2, 6); return num(P(`<span class="big">${a} horas = ? minutos</span>`), a * 60, { unit: "min", hints: ["1 hora = 60 minutos.", `Multiplica ${a} × 60.`] }); },
+  () => { const a = ri(2, 5); return num(P(`<span class="big">${a} minutos = ? segundos</span>`), a * 60, { unit: "s", hints: ["1 minuto = 60 segundos.", `Multiplica ${a} × 60.`] }); },
+  () => { const a = ri(2, 4); return num(P(`<span class="big">${a} días = ? horas</span>`), a * 24, { unit: "h", hints: ["1 día = 24 horas.", `Multiplica ${a} × 24.`] }); },
+  () => { const a = ri(1, 3), b = pick([10, 15, 20, 30, 45]); return num(P(`<span class="big">${a} h y ${b} min = ? minutos</span>`), a * 60 + b, { unit: "min", hints: ["Convierte primero las horas a minutos.", "Luego suma los minutos que sobran."] }); },
+  () => { const f = pick([["media hora", 30, "min"], ["un cuarto de hora", 15, "min"], ["tres cuartos de hora", 45, "min"], ["medio día", 12, "h"], ["medio minuto", 30, "s"]]); return num(P(`¿Cuánto es <b>${f[0]}</b>?`), f[1], { unit: f[2], hints: ["1 hora = 60 min, 1 minuto = 60 s y 1 día = 24 h.", "Medio es la mitad y un cuarto es la cuarta parte."] }); },
+  () => {
+    const t = pick([["7:00 a. m.", 0], ["10:30 a. m.", 0], ["3:00 p. m.", 1], ["5:15 p. m.", 1], ["9:00 p. m.", 2], ["10:45 p. m.", 2]]);
+    return choice(P(`${pick(NAMES)} hace algo a las <b>${t[0]}</b>. ¿En qué parte del día es?`), ["En la mañana", "En la tarde", "En la noche"], t[1],
+      { hints: ["a. m. son las horas antes del mediodía.", "p. m. son las horas después del mediodía; después de las 7 p. m. ya es de noche."] });
+  }
+];
+/* ===== Lección 70 · Reloj ===== */
+const H70 = ["La aguja corta (roja) marca la hora y la larga (azul) los minutos.", "Cada número que avanza la aguja larga son 5 minutos. Cuenta de 5 en 5."];
+const L70 = [
+  () => { const h = ri(1, 12), m = ri(0, 11) * 5; return timeQ(P("¿Qué hora marca el reloj?") + fig(clockSVG(h, m)), h, m, { hints: H70 }); },
+  () => { const h = ri(1, 12), m = ri(0, 11) * 5; return timeQ(P("¿Qué hora marca el reloj?") + fig(clockSVG(h, m)), h, m, { hints: H70 }); },
+  () => {
+    const h = ri(1, 10), m = ri(0, 11) * 5, add = pick([[60, "1 hora"], [30, "media hora"], [15, "un cuarto de hora"], [90, "1 hora y media"], [45, "45 minutos"]]);
+    const t = h * 60 + m + add[0]; let H = Math.floor(t / 60) % 12; if (H === 0) H = 12;
+    return timeQ(P(`Este reloj marca la hora en que empieza el recreo. ¿Qué hora será <b>${add[1]}</b> después?`) + fig(clockSVG(h, m)), H, t % 60,
+      { hints: [H70[0], "Suma primero las horas y después los minutos. Si los minutos pasan de 60, suma 1 hora más."] });
+  }
+];
+/* ===== Lección 71 · Duración de eventos ===== */
+const EVENTS = ["la película", "el partido de fútbol", "la clase de música", "la fiesta de cumpleaños", "el viaje en bus", "el ensayo del acto cívico"];
+const hm = (t) => { let H = Math.floor(t / 60) % 12; if (H === 0) H = 12; return H + ":" + pad(t % 60); };
+const H71 = ["Cuenta primero hasta la siguiente hora en punto.", "Luego suma las horas completas y los minutos que faltan. 1 hora = 60 minutos."];
+const L71 = [
+  () => { const s = ri(1, 9) * 60 + ri(0, 11) * 5, d = pick([25, 35, 40, 45, 50, 55, 65, 75, 80, 90, 105, 120]); return num(P(`${cap(pick(EVENTS))} empezó a las <b>${hm(s)}</b> y terminó a las <b>${hm(s + d)}</b>. ¿Cuántos minutos duró?`), d, { unit: "min", hints: H71 }); },
+  () => { const s = ri(1, 9) * 60 + ri(0, 11) * 5, d = pick([20, 30, 35, 45, 50, 75, 90]), e = s + d; return timeQ(P(`${cap(pick(EVENTS))} empezó a las <b>${hm(s)}</b> y duró <b>${d} minutos</b>. ¿A qué hora terminó?`), Number(hm(e).split(":")[0]), e % 60, { hints: ["Suma los minutos a la hora de inicio.", "Si los minutos pasan de 60, cambia 60 minutos por 1 hora."] }); },
+  () => { const s = ri(1, 9) * 60 + ri(0, 11) * 5, d = pick([30, 40, 45, 60, 90]), e = s + d; return timeQ(P(`${cap(pick(EVENTS))} terminó a las <b>${hm(e)}</b> y duró <b>${d} minutos</b>. ¿A qué hora empezó?`), Number(hm(s).split(":")[0]), s % 60, { hints: ["Esta vez tienes que restar el tiempo a la hora final.", "Si no te alcanzan los minutos, cambia 1 hora por 60 minutos."] }); }
+];
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+/* ===== Lección 72 · Registro de datos ===== */
+const L72 = [
+  () => { const n = ri(6, 28); return num(P("¿Qué número representan estos palotes?") + fig(tallySVG(n)), n, { hints: ["Cada grupo cerrado con la línea cruzada vale 5.", "Cuenta los grupos de 5 en 5 y suma los palotes sueltos."] }); },
+  () => {
+    const n = ri(7, 19), vals = [n, n - 1, n + 1, n + 5].filter(v => v > 0);
+    return choice(P(`¿Cuál de estos registros representa el número <b>${n}</b>?`), vals.map(v => tallySVG(v, 34)), 0, { hints: ["Cada grupo de 5 tiene 4 palotes y uno cruzado.", `${n} = ${Math.floor(n / 5)} grupos de 5 y ${n % 5} palotes sueltos.`] });
+  },
+  () => {
+    const cats = sample(["fútbol", "béisbol", "natación", "baloncesto", "ciclismo"], 3), vals = cats.map(() => ri(4, 16)), i = ri(0, 2);
+    const total = Math.random() < .4;
+    const tbl = `<div class="scroll"><table class="data"><tr><th>Deporte favorito</th><th>Conteo</th></tr>${cats.map((c, j) => `<tr><td>${c}</td><td>${tallySVG(vals[j], 26)}</td></tr>`).join("")}</table></div>`;
+    return num(P(total ? "¿Cuántos estudiantes votaron <b>en total</b>?" : `¿Cuántos estudiantes eligieron <b>${cats[i]}</b>?`) + fig(tbl), total ? vals.reduce((a, b) => a + b) : vals[i],
+      { unit: "estudiantes", hints: ["Cuenta los palotes de 5 en 5.", total ? "Cuenta cada fila y luego suma los tres números." : "Fíjate solo en la fila de " + cats[i] + "."] });
+  }
+];
+/* ===== Lección 73 · Organización de datos ===== */
+const FRUITS = [["🍎", "manzana"], ["🍌", "banano"], ["🍊", "naranja"], ["🍇", "uvas"], ["🥭", "mango"], ["🍉", "sandía"]];
+function fruitData() {
+  const kinds = sample(FRUITS, ri(3, 4)), counts = sample([2, 3, 4, 5, 6, 7, 8, 9], kinds.length);
+  const list = shuffle(kinds.flatMap((k, i) => Array(counts[i]).fill(k[0])));
+  return { kinds, counts, box: fig(`<div class="items" aria-label="Frutas elegidas">${list.join(" ")}</div>`) };
+}
+const H73 = ["Haz una tabla: escribe cada fruta y marca un palote cada vez que la veas.", "Cuenta despacio y tacha mentalmente cada dibujo que ya contaste."];
+const L73 = [
+  () => { const d = fruitData(), i = ri(0, d.kinds.length - 1); return num(P(`Los estudiantes eligieron su fruta favorita. ¿Cuántos eligieron <b>${d.kinds[i][1]}</b> ${d.kinds[i][0]}?`) + d.box, d.counts[i], { unit: "estudiantes", hints: H73 }); },
+  () => { const d = fruitData(), mx = d.counts.indexOf(Math.max(...d.counts)); return choice(P("¿Cuál fue la fruta <b>más elegida</b>?") + d.box, d.kinds.map(k => k[0] + " " + k[1]), mx, { hints: H73 }); },
+  () => { const d = fruitData(); return num(P("¿Cuántos estudiantes votaron <b>en total</b>?") + d.box, d.counts.reduce((a, b) => a + b), { unit: "estudiantes", hints: [H73[0], "Suma los resultados de todas las frutas."] }); },
+  () => {
+    const d = fruitData(), [i, j] = sample([...d.kinds.keys()], 2);
+    const hi = d.counts[i] >= d.counts[j] ? i : j, lo = hi === i ? j : i;
+    const tbl = `<div class="scroll"><table class="data"><tr><th>Fruta</th><th>Votos</th></tr>${d.kinds.map((k, n) => `<tr><td>${k[0]} ${k[1]}</td><td>${d.counts[n]}</td></tr>`).join("")}</table></div>`;
+    return num(P(`Según la tabla, ¿cuántos votos <b>más</b> tiene ${d.kinds[hi][1]} que ${d.kinds[lo][1]}?`) + fig(tbl), d.counts[hi] - d.counts[lo], { unit: "votos", hints: ["Busca los dos números en la tabla.", "Resta el número menor al mayor."] });
+  }
+];
+/* ===== Lección 74 · Pictogramas ===== */
+function pictoData() {
+  const k = pick([2, 5, 10]), theme = pick([["📚", "Libros leídos", DAYS.slice(0, 5)], ["🧃", "Jugos vendidos", DAYS.slice(0, 5)], ["🌳", "Árboles sembrados", ["4.º A", "4.º B", "4.º C", "4.º D"]]]);
+  const cats = theme[2].slice(0, 4), icons = cats.map(() => ri(1, 7));
+  const tbl = `<div class="scroll"><table class="data"><tr><th colspan="2">${theme[1]}</th></tr>${cats.map((c, i) => `<tr><td>${c}</td><td class="ic">${theme[0].repeat(icons[i])}</td></tr>`).join("")}</table></div><div class="key">Clave: ${theme[0]} = ${k}</div>`;
+  return { k, cats, icons, icon: theme[0], html: fig("<div>" + tbl + "</div>") };
+}
+const L74 = [
+  () => { const d = pictoData(), i = ri(0, 3); return num(P(`¿Cuánto representa el pictograma para <b>${d.cats[i]}</b>?`) + d.html, d.icons[i] * d.k, { hints: [`Mira la clave: cada dibujo vale ${d.k}.`, `Cuenta los dibujos y multiplica por ${d.k}.`] }); },
+  () => { const d = pictoData(); let [i, j] = sample([0, 1, 2, 3], 2); if (d.icons[i] < d.icons[j]) [i, j] = [j, i]; if (d.icons[i] === d.icons[j]) d.icons[i]++; return num(P(`¿Cuántos más hay en <b>${d.cats[i]}</b> que en <b>${d.cats[j]}</b>?`) + pictoData.redraw(d), (d.icons[i] - d.icons[j]) * d.k, { hints: [`Cada dibujo vale ${d.k}.`, "Calcula el valor de cada fila y resta."] }); },
+  () => { const d = pictoData(); return num(P("¿Cuál es el <b>total</b> del pictograma?") + d.html, d.icons.reduce((a, b) => a + b) * d.k, { hints: [`Cada dibujo vale ${d.k}.`, `Cuenta todos los dibujos y multiplica por ${d.k}.`] }); },
+  () => { const k = pick([2, 5, 10]), n = ri(3, 9); return num(P(`En un pictograma la clave es <b>⭐ = ${k}</b>. ¿Cuántas estrellas necesitas dibujar para representar <b>${n * k}</b>?`), n, { unit: "estrellas", hints: [`Cada estrella vale ${k}.`, `Divide ${n * k} entre ${k}.`] }); }
+];
+pictoData.redraw = (d) => {
+  const theme = d.icon;
+  const rows = d.cats.map((c, i) => `<tr><td>${c}</td><td class="ic">${theme.repeat(d.icons[i])}</td></tr>`).join("");
+  return fig(`<div><div class="scroll"><table class="data">${rows}</table></div><div class="key">Clave: ${theme} = ${d.k}</div></div>`);
+};
+/* ===== Lección 75 · Moneda nacional ===== */
+const L75 = [
+  () => {
+    const bills = sample([1, 2, 5, 10, 20, 50, 100], ri(2, 3)).sort((a, b) => b - a), coins = Array.from({ length: ri(0, 3) }, () => pick(CUR.coins)).sort((a, b) => b - a);
+    const total = round2(bills.reduce((a, b) => a + b, 0) + coins.reduce((a, b) => a + b, 0) / 100);
+    return num(P("¿Cuánto dinero hay en total?") + fig(moneyRow(bills, coins)), total, Object.assign(mq(total), { hints: ["Suma primero los billetes, del mayor al menor.", "Luego suma las monedas: 100 centavos forman 1 " + CUR.one + "."] }));
+  },
+  () => { const a = round2(ri(1, 9) + pick([0, .25, .5, .75])); return num(P(`¿Cuántos centavos hay en <b>${money(a)}</b>?`), Math.round(a * 100), { unit: "centavos", hints: [`1 ${CUR.one} = 100 centavos.`, "Multiplica los lempiras por 100 y suma los centavos."] }); },
+  () => { const c = ri(2, 9) * 100 + pick([0, 50]); return num(P(`¿A cuántos ${CUR.many} equivalen <b>${c} centavos</b>?`), c / 100, Object.assign(mq(c / 100), { hints: [`100 centavos = 1 ${CUR.one}.`, "Divide entre 100."] })); }
+];
+/* ===== Lección 76 · Escritura de cantidades ===== */
+const L76 = [
+  () => { const a = round2(ri(5, 999) + pick([0, .25, .5, .75, .1, .05, .9])); return num(P(`Escribe con números: <b>${moneyWords(a)}</b>.`), a, Object.assign(mq(a), { hints: ["Primero escribe los lempiras, luego un punto y los centavos.", "Los centavos siempre llevan dos cifras: cinco centavos se escribe .05"] })); },
+  () => {
+    const a = round2(ri(21, 899) + pick([.25, .5, .75, .15, .4])), l = Math.floor(a), c = Math.round((a - l) * 100);
+    const swapped = Number(String(l).split("").reverse().join(""));
+    const cand = [a, round2(l + 10 + c / 100), round2(l + (c === 50 ? 25 : 50) / 100), round2((swapped !== l ? swapped : l + 100) + c / 100), round2(l - 1 + c / 100)];
+    const opts = [...new Set(cand)].slice(0, 4);
+    return choice(P(`¿Cómo se lee <span class="big">${money(a)}</span>?`), opts.map(moneyWords), 0, { hints: ["Lee primero la parte entera (antes del punto): son los lempiras.", "Después del punto están los centavos."] });
+  }
+];
+/* ===== Lección 77 · Equivalencias ===== */
+function combo(total) {
+  const res = []; let rest = total; const den = CUR.bills.filter(b => b <= total);
+  while (rest > 0) { const opts = den.filter(b => b <= rest && b < total); const b = opts.length ? pick(opts.slice(-3)) : rest; res.push(b); rest -= b; }
+  return res.sort((a, b) => b - a);
+}
+const L77 = [
+  () => { const [a, b] = pick([[10, 100], [20, 100], [50, 100], [5, 50], [20, 200], [100, 500], [50, 200], [10, 50], [2, 10], [1, 5], [5, 20], [50, 500]]); return num(P(`¿Cuántos billetes de <b>${CUR.sym} ${a}</b> necesitas para formar <b>${CUR.sym} ${b}</b>?`) + fig(moneyRow([b]) + " = ? × " + moneyRow([a])), b / a, { unit: "billetes", hints: [`Cuenta de ${a} en ${a} hasta llegar a ${b}.`, `También puedes dividir ${b} ÷ ${a}.`] }); },
+  () => { const c = pick([50, 25, 20, 10]), n = ri(1, c === 10 ? 2 : 4); const coin = c === 25 ? 20 : c; return num(P(`¿Cuántas monedas de <b>${coin} centavos</b> equivalen a <b>${money(n)}</b>?`) + fig(moneyRow([], [coin])), n * 100 / coin, { unit: "monedas", hints: [`1 ${CUR.one} = 100 centavos.`, `Convierte a centavos y divide entre ${coin}.`] }); },
+  () => {
+    const t = pick([20, 50, 100, 200]), good = combo(t), bads = [combo(t - pick([5, 10])), combo(t + pick([5, 10])), combo(t - 1 > 0 ? t - 2 : t + 2)];
+    const opts = [good, ...bads].map(c => moneyRow(c));
+    return choice(P(`¿Qué grupo de billetes equivale a <b>${CUR.sym} ${t}</b>?`), opts, 0, { hints: ["Suma los billetes de cada grupo.", `Solo un grupo suma exactamente ${CUR.sym} ${t}.`] });
+  }
+];
+/* ===== Lección 78 · Orden de cantidades ===== */
+const H78 = ["Compara primero los lempiras (antes del punto).", "Si los lempiras son iguales, compara los centavos."];
+const L78 = [
+  () => { const base = ri(10, 400); let v; do { v = Array.from({ length: 4 }, () => round2(base + ri(-20, 20) + pick([0, .25, .5, .75, .05, .9]))); } while (new Set(v).size < 4); const big = Math.random() < .5; const t = big ? Math.max(...v) : Math.min(...v); return choice(P(`¿Cuál cantidad es la <b>${big ? "mayor" : "menor"}</b>?`), v.map(money), v.indexOf(t), { hints: H78 }); },
+  () => {
+    const a = round2(ri(5, 300) + pick([0, .25, .5, .75])); let b = Math.random() < .3 ? a : round2(a + pick([-1, 1]) * pick([.25, .5, 1, 10, .05]));
+    if (b <= 0) b = a;
+    const useCents = a === b && Math.random() < .5;
+    const right = useCents ? `${Math.round(b * 100)} centavos` : money(b);
+    return choice(P(`¿Qué signo va en el espacio?`) + fig(`<span class="big">${money(a)} &nbsp;___&nbsp; ${right}</span>`), ["&gt; (mayor que)", "&lt; (menor que)", "= (igual a)"], a > b ? 0 : a < b ? 1 : 2, { hints: H78.concat(["100 centavos = 1 " + CUR.one + "."]).slice(useCents ? 1 : 0) });
+  }
+];
+/* ===== Lección 79 · Adición ===== */
+const H79 = ["Escribe las cantidades una debajo de otra, con los puntos alineados.", "Suma primero los centavos. Si llegan a 100, lleva 1 " + CUR.one + "."];
+const L79 = [
+  () => { const [p1, p2] = sample(PRODUCTS, 2), a = price(5, 90), b = price(3, 60); return num(P(`${p1[0]} ${cap(p1[1])} cuesta <b>${money(a)}</b> y ${p2[0]} ${p2[1]} cuesta <b>${money(b)}</b>. ¿Cuánto pagas por los dos?`), round2(a + b), Object.assign(mq(round2(a + b)), { hints: H79 })); },
+  () => { const ps = sample(PRODUCTS, 3), v = ps.map(() => price(5, 50)); return num(P("¿Cuánto cuesta todo junto?") + fig(`<div class="scroll"><table class="data">${ps.map((p, i) => `<tr><td>${p[0]} ${p[1]}</td><td>${money(v[i])}</td></tr>`).join("")}</table></div>`), round2(v[0] + v[1] + v[2]), Object.assign(mq(round2(v[0] + v[1] + v[2])), { hints: H79 })); },
+  () => { const w = pick(NAMES), a = price(20, 300), b = price(10, 150); return num(P(`${w} tenía <b>${money(a)}</b> ahorrados y su abuela le regaló <b>${money(b)}</b>. ¿Cuánto tiene ahora?`), round2(a + b), Object.assign(mq(round2(a + b)), { hints: H79 })); }
+];
+/* ===== Lección 80 · Sustracción ===== */
+const H80 = ["Resta: el dinero que tienes menos lo que cuesta.", "Alinea los puntos. Si no alcanza en los centavos, presta 1 " + CUR.one + " = 100 centavos."];
+const L80 = [
+  () => { const p = PRODUCTS[ri(0, PRODUCTS.length - 1)], a = price(5, 180), bill = [20, 50, 100, 200, 500].find(b => b > a); return num(P(`${p[0]} ${cap(p[1])} cuesta <b>${money(a)}</b>. Pagas con un billete de <b>${CUR.sym} ${bill}</b>. ¿Cuánto te dan de vuelto?`) + fig(moneyRow([bill])), round2(bill - a), Object.assign(mq(round2(bill - a)), { hints: H80 })); },
+  () => { const [p1, p2] = sample(PRODUCTS, 2), a = price(60, 200), b = price(5, 55); return num(P(`${p1[0]} ${cap(p1[1])} cuesta <b>${money(a)}</b> y ${p2[0]} ${p2[1]} cuesta <b>${money(b)}</b>. ¿Cuánto <b>más</b> cuesta ${p1[1]}?`), round2(a - b), Object.assign(mq(round2(a - b)), { hints: ["Para saber cuánto más, resta la cantidad menor a la mayor.", H80[1]] })); },
+  () => { const w = pick(NAMES), a = price(100, 500), b = price(15, 95); return num(P(`${w} tenía <b>${money(a)}</b> y gastó <b>${money(b)}</b> en la feria. ¿Cuánto le queda?`), round2(a - b), Object.assign(mq(round2(a - b)), { hints: H80 })); }
+];
+
+/* ===== Catálogo ===== */
+const UNITS = [
+  { name: "Masa y figuras", color: "var(--u-masa)", lessons: [[63, 190, "Masa", L63], [64, 192, "Unidades de masa del sistema métrico decimal", L64], [65, 194, "Unidades de masa del sistema inglés", L65], [66, 196, "Figuras simétricas", L66], [67, 198, "Rotaciones de figuras", L67]] },
+  { name: "El tiempo", color: "var(--u-tiempo)", lessons: [[68, 202, "Calendario", L68], [69, 204, "Mediciones relacionadas con el día", L69], [70, 206, "Reloj", L70], [71, 208, "Duración de eventos", L71]] },
+  { name: "Datos", color: "var(--u-datos)", lessons: [[72, 214, "Registro de datos", L72], [73, 216, "Organización de datos", L73], [74, 218, "Pictogramas", L74]] },
+  { name: "Dinero", color: "var(--u-dinero)", lessons: [[75, 222, "Moneda nacional", L75], [76, 224, "Escritura de cantidades monetarias", L76], [77, 226, "Equivalencias de billetes y monedas", L77], [78, 228, "Relación de orden entre cantidades monetarias", L78], [79, 230, "Adición de cantidades monetarias", L79], [80, 232, "Sustracción de cantidades monetarias", L80]] }
+];
+const LESSONS = {};
+UNITS.forEach(u => u.lessons.forEach(([id, page, name, gens]) => { LESSONS[id] = { id, page, name, gens, color: u.color, unit: u.name }; }));
+const ALL = Object.values(LESSONS);
+const tagged = (lessonIds) => () => { const l = LESSONS[pick(lessonIds)]; const q = pick(l.gens)(); q.tag = "Lección " + l.id + " · " + l.name; return q; };
+const GAMES = [
+  { key: "desafios", ico: "🏆", title: "Desafíos matemáticos", desc: "10 preguntas sorpresa de todo el parcial.", n: 10, color: "var(--margin)", gen: tagged(ALL.map(l => l.id)) },
+  { key: "espejo", ico: "🪞", title: "Espejo mágico", desc: "Completa figuras simétricas en la cuadrícula.", n: 5, color: "var(--u-masa)", gen: () => Object.assign(mirrorGridQ(), { tag: "Lección 66 · Figuras simétricas" }) },
+  { key: "tiempo", ico: "⏰", title: "Maestro del tiempo", desc: "Relojes, calendarios y cuánto dura cada evento.", n: 8, color: "var(--u-tiempo)", gen: tagged([68, 70, 70, 71]) },
+  { key: "pulperia", ico: "🛒", title: "La pulpería", desc: "Compra, paga y calcula el vuelto.", n: 8, color: "var(--u-dinero)", gen: tagged([75, 77, 79, 79, 80, 80]) }
+];
+
+/* ===== Progreso guardado en este navegador ===== */
+let saved = { best: {} };
+try { const s = JSON.parse(localStorage.getItem("mate4p4") || "null"); if (s && s.best) saved = s; } catch (e) { /* sin almacenamiento */ }
+const persist = () => { try { localStorage.setItem("mate4p4", JSON.stringify(saved)); } catch (e) { /* sin almacenamiento */ } };
+const totalStars = () => Object.values(saved.best).reduce((a, b) => a + b, 0);
+const badge = (got, max) => { const r = got / max, n = got === 0 ? 0 : r >= .85 ? 3 : r >= .6 ? 2 : 1; return "★".repeat(n) + `<span class="off">${"★".repeat(3 - n)}</span>`; };
+
+/* ===== Sonido ===== */
+let soundOn = true, actx = null;
+function tone(freqs, dur = .12) {
+  if (!soundOn) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    freqs.forEach((f, i) => {
+      const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + i * dur;
+      o.type = "triangle"; o.frequency.value = f; g.gain.setValueAtTime(.18, t); g.gain.exponentialRampToValueAtTime(.001, t + dur * 1.6);
+      o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur * 1.7);
+    });
+  } catch (e) { /* sin audio */ }
+}
+
+/* ===== Confeti ===== */
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function confetti() {
+  if (reduce) return;
+  const cv = $("confetti"), ctx = cv.getContext("2d"); cv.width = innerWidth; cv.height = innerHeight;
+  const cols = ["#f4b400", "#2457c5", "#e98479", "#1d8049", "#8239ad"];
+  const ps = Array.from({ length: 70 }, () => ({ x: innerWidth / 2, y: innerHeight * .45, vx: (Math.random() - .5) * 14, vy: -Math.random() * 12 - 4, s: 5 + Math.random() * 6, c: pick(cols), r: Math.random() * 6 }));
+  let f = 0;
+  (function step() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    ps.forEach(p => { p.x += p.vx; p.y += p.vy; p.vy += .45; p.r += .2; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); ctx.restore(); });
+    if (++f < 70) requestAnimationFrame(step); else ctx.clearRect(0, 0, cv.width, cv.height);
+  })();
+}
+
+/* ===== Pantalla de inicio ===== */
+function renderHome() {
+  $("starbank").textContent = "★ " + totalStars();
+  $("games").innerHTML = GAMES.map(g => `<button class="game" type="button" data-game="${g.key}" style="--gc:${g.color}"><span class="g-ico" aria-hidden="true">${g.ico}</span><h3>${g.title}</h3><p>${g.desc}</p><span class="g-stars">${saved.best["g-" + g.key] != null ? "Mejor: ★ " + saved.best["g-" + g.key] + " de " + g.n * 3 : g.n + " preguntas"}</span></button>`).join("");
+  $("units").innerHTML = UNITS.map(u => `<section class="unit" style="--uc:${u.color}"><h3>${u.name}</h3><div class="lessons">${u.lessons.map(([id, page, name]) => {
+    const b = saved.best["l-" + id];
+    return `<button class="lesson" type="button" data-lesson="${id}" style="--uc:${u.color}"><span class="badge">${id}</span><span><span class="ln">${name}</span><br><span class="pg">pág. ${page}</span></span><span class="ls" aria-label="${b || 0} estrellas">${badge(b || 0, 15)}</span></button>`;
+  }).join("")}</div></section>`).join("");
+}
+document.addEventListener("click", (e) => {
+  const g = e.target.closest("[data-game]"), l = e.target.closest("[data-lesson]");
+  if (g) { const G = GAMES.find(x => x.key === g.dataset.game); start({ key: "g-" + G.key, title: G.ico + " " + G.title, n: G.n, gen: G.gen }); }
+  if (l) { const L = LESSONS[l.dataset.lesson]; start({ key: "l-" + L.id, title: L.id + ". " + L.name, n: 5, gen: () => Object.assign(pick(L.gens)(), { tag: "Lección " + L.id + " · pág. " + L.page }) }); }
+});
+
+/* ===== Motor del juego ===== */
+let S = null; // sesión actual
+function show(id) { ["home", "play", "result"].forEach(s => { $(s).hidden = s !== id; }); window.scrollTo(0, 0); }
+function start(cfg) { S = Object.assign({ i: 0, stars: 0, log: [] }, cfg); show("play"); $("pl-title").textContent = cfg.title; next(); }
+function next() {
+  if (S.i >= S.n) return finish();
+  S.q = S.gen(); S.tries = 0; S.done = false; S.i++;
+  $("pl-count").textContent = "Pregunta " + S.i + " de " + S.n;
+  $("pl-prog").style.width = ((S.i - 1) / S.n * 100) + "%";
+  renderQ(S.q);
+}
+function renderQ(q) {
+  $("q-tag").textContent = q.tag || "";
+  $("q-body").innerHTML = q.html;
+  $("feedback").textContent = ""; $("feedback").className = "feedback";
+  $("hint").hidden = true; $("hint").innerHTML = "";
+  $("reveal").hidden = true; $("reveal").innerHTML = "";
+  $("btn-next").hidden = true; $("btn-check").hidden = false; $("btn-check").disabled = false; $("btn-clear").hidden = true;
+  const A = $("q-answer");
+  if (q.type === "num") {
+    A.innerHTML = `<div class="numrow">${q.prefix ? `<span>${q.prefix}</span>` : ""}<input id="ans" inputmode="decimal" autocomplete="off" aria-label="Tu respuesta">${q.unit ? `<span>${q.unit}</span>` : ""}</div>`;
+  } else if (q.type === "time") {
+    A.innerHTML = `<div class="numrow"><input id="ans-h" class="short" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="Hora" placeholder="h"><span>:</span><input id="ans-m" class="short" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="Minutos" placeholder="mm"></div>`;
+  } else if (q.type === "choice") {
+    $("btn-check").hidden = true;
+    renderOptions(q);
+  } else if (q.type === "grid") {
+    q.on = new Set();
+    $("btn-clear").hidden = false;
+    renderGrid(q);
+  }
+  renderTries();
+  const first = A.querySelector("input"); if (first) setTimeout(() => first.focus({ preventScroll: true }), 50);
+}
+function renderOptions(q) {
+  // El orden cambia después de cada intento fallido, así no se puede adivinar por eliminación.
+  const order = shuffle(q.options.map((_, i) => i));
+  $("q-answer").innerHTML = `<div class="opts">${order.map(i => `<button class="opt" type="button" data-opt="${i}">${q.options[i]}</button>`).join("")}</div>`;
+}
+function renderGrid(q, solution = false) {
+  let s = `<div class="mgrid" style="grid-template-columns:repeat(${q.cols}, auto)">`;
+  for (let y = 0; y < q.rows; y++) for (let x = 0; x < q.cols; x++) {
+    const k = x + "," + y, fixed = q.fixed.has(k);
+    const userSide = q.vertical ? x >= q.cols / 2 : y >= q.rows / 2;
+    let cls = fixed ? "fixed" : solution ? (q.answer.has(k) ? "sol" : "") : (q.on.has(k) ? "on" : "");
+    if (!userSide || solution || S.done) cls += " locked";
+    s += `<button type="button" data-cell="${k}" class="${cls.trim()}" ${!userSide ? 'tabindex="-1" aria-hidden="true"' : `aria-label="Cuadro ${x + 1}, ${y + 1}" aria-pressed="${q.on.has(k)}"`}></button>`;
+  }
+  s += q.vertical ? `<div class="axis" style="left:calc(50% - 2.5px);top:-6px;bottom:-6px;width:5px"></div>` : `<div class="axis" style="top:calc(50% - 2.5px);left:-6px;right:-6px;height:5px"></div>`;
+  $("q-answer").innerHTML = s + "</div>";
+}
+function renderTries() {
+  const t = S.tries;
+  $("tries-label").textContent = S.done ? (S.q.revealed ? "Se usaron los 6 intentos" : "¡Correcto en el intento " + t + "!") : "Intento " + (t + 1) + " de " + MAX_TRIES;
+  $("dots").innerHTML = Array.from({ length: MAX_TRIES }, (_, i) => `<span class="dot ${i < t ? (S.done && !S.q.revealed && i === t - 1 ? "win" : "used") : ""}"></span>`).join("");
+}
+$("q-answer").addEventListener("click", (e) => {
+  if (!S || S.done) return;
+  const o = e.target.closest("[data-opt]");
+  if (o) return submit(Number(o.dataset.opt), o);
+  const c = e.target.closest("[data-cell]");
+  if (c && !c.classList.contains("locked")) { const k = c.dataset.cell; S.q.on.has(k) ? S.q.on.delete(k) : S.q.on.add(k); c.classList.toggle("on"); c.setAttribute("aria-pressed", S.q.on.has(k)); }
+});
+$("q-answer").addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.tagName === "INPUT") { e.preventDefault(); check(); } });
+$("btn-check").addEventListener("click", check);
+$("btn-clear").addEventListener("click", () => { if (S && !S.done && S.q.type === "grid") { S.q.on.clear(); renderGrid(S.q); } });
+$("btn-next").addEventListener("click", next);
+$("btn-exit").addEventListener("click", () => { S = null; renderHome(); show("home"); });
+$("btn-home").addEventListener("click", () => { renderHome(); show("home"); });
+$("btn-again").addEventListener("click", () => start({ key: S.key, title: S.title, n: S.n, gen: S.gen }));
+$("btn-sound").addEventListener("click", (e) => { soundOn = !soundOn; e.currentTarget.textContent = "Sonido: " + (soundOn ? "sí" : "no"); e.currentTarget.setAttribute("aria-pressed", soundOn); });
+
+function parseNum(s) {
+  s = String(s).trim().replace(/^[Ll]\s*/, "").replace(/[\s ]/g, "");
+  if (/^\d{1,3}(,\d{3})+(\.\d+)?$/.test(s)) s = s.replace(/,/g, "");
+  else s = s.replace(",", ".");
+  if (!/^-?\d*\.?\d+$/.test(s) && !/^-?\d+\.$/.test(s)) return null;
+  return Number(s);
+}
+function check() {
+  if (!S || S.done) return;
+  const q = S.q;
+  if (q.type === "num") {
+    const v = parseNum($("ans").value);
+    if (v === null) return say("info", "Escribe un número para comprobar.");
+    submit(Math.abs(v - q.answer) < 0.001);
+  } else if (q.type === "time") {
+    const h = parseInt($("ans-h").value, 10), m = parseInt($("ans-m").value, 10);
+    if (isNaN(h) || isNaN(m) || h < 0 || h > 24 || m < 0 || m > 59) return say("info", "Escribe la hora en el primer cuadro y los minutos en el segundo. Ejemplo: 3 : 45");
+    submit(h % 12 === q.answer.h % 12 && m === q.answer.m);
+  } else if (q.type === "grid") {
+    if (!q.on.size) return say("info", "Toca los cuadros para pintar la otra mitad de la figura.");
+    let wrong = 0; q.answer.forEach(k => { if (!q.on.has(k)) wrong++; }); q.on.forEach(k => { if (!q.answer.has(k)) wrong++; });
+    q.wrongCells = wrong;
+    submit(wrong === 0);
+  }
+}
+const CHEERS = ["¡Excelente!", "¡Muy bien!", "¡Lo lograste!", "¡Bravo!", "¡Genial!"];
+const RETRY = ["Todavía no. ¡Inténtalo otra vez!", "Casi. Revisa tu trabajo.", "No es esa. ¡Tú puedes!", "Sigue intentando, vas aprendiendo."];
+function submit(arg, optEl) {
+  const q = S.q;
+  const ok = q.type === "choice" ? arg === q.correct : arg;
+  S.tries++;
+  if (ok) {
+    S.done = true;
+    const st = S.tries === 1 ? 3 : S.tries <= 3 ? 2 : 1;
+    S.stars += st; S.log.push({ tries: S.tries, stars: st });
+    if (optEl) optEl.classList.add("right");
+    say("ok", pick(CHEERS) + " +" + "★".repeat(st));
+    tone([660, 880, 1175]); confetti();
+    if (q.type === "grid") renderGrid(q);
+    lockInputs(); endQuestion();
+    return;
+  }
+  tone([220, 180], .14);
+  if (S.tries >= MAX_TRIES) {
+    S.done = true; q.revealed = true; S.log.push({ tries: S.tries, stars: 0, revealed: true });
+    say("bad", "Se acabaron los 6 intentos. Mira cómo se resuelve:");
+    $("reveal").hidden = false;
+    $("reveal").innerHTML = `<div>La respuesta correcta es:</div><div class="ans">${q.answerText}</div>${q.hints.length ? "<div>" + q.hints.join(" ") + "</div>" : ""}`;
+    if (q.type === "grid") renderGrid(q, true);
+    if (q.type === "choice") renderSolvedOptions(q);
+    lockInputs(); endQuestion();
+    return;
+  }
+  let msg = pick(RETRY);
+  if (q.type === "grid") msg = `Hay ${q.wrongCells} cuadro${q.wrongCells === 1 ? "" : "s"} que no coincide${q.wrongCells === 1 ? "" : "n"} con el espejo.`;
+  say("bad", msg);
+  if (q.type === "choice") { renderOptions(q); }
+  else { const inp = $("q-answer").querySelector("input"); if (inp) { inp.select(); } }
+  const shown = q.hints.slice(0, S.tries >= 4 ? 2 : S.tries >= 2 ? 1 : 0);
+  if (shown.length) { $("hint").hidden = false; $("hint").innerHTML = "<b>Pista:</b><ul>" + shown.map(h => "<li>" + h + "</li>").join("") + "</ul>"; }
+  renderTries();
+}
+function renderSolvedOptions(q) {
+  $("q-answer").innerHTML = `<div class="opts"><div class="opt right">${q.options[q.correct]}</div></div>`;
+}
+function lockInputs() { $("q-answer").querySelectorAll("input").forEach(i => { i.disabled = true; }); }
+function endQuestion() {
+  renderTries();
+  $("btn-check").hidden = true; $("btn-clear").hidden = true; $("btn-next").hidden = false;
+  $("btn-next").textContent = S.i >= S.n ? "Ver resultado →" : "Siguiente →";
+  $("pl-prog").style.width = (S.i / S.n * 100) + "%";
+  setTimeout(() => $("btn-next").focus({ preventScroll: true }), 50);
+}
+function say(kind, text) { const f = $("feedback"); f.className = "feedback " + kind; f.textContent = text; }
+function finish() {
+  const max = S.n * 3, prev = saved.best[S.key];
+  if (prev == null || S.stars > prev) { saved.best[S.key] = S.stars; persist(); }
+  show("result");
+  const r = S.stars / max;
+  $("r-title").textContent = r >= .85 ? "¡Eres un campeón!" : r >= .6 ? "¡Muy buen trabajo!" : r > 0 ? "¡Buen esfuerzo!" : "¡Sigue practicando!";
+  $("r-stars").innerHTML = badge(S.stars, max);
+  $("r-text").textContent = `Ganaste ${S.stars} de ${max} estrellas en «${S.title}».` + (prev != null && S.stars > prev ? " ¡Nuevo récord!" : "");
+  $("r-summary").innerHTML = S.log.map((l, i) => `<span class="${l.revealed ? "r" : ""}">P${i + 1}: ${l.revealed ? "6 intentos" : l.tries === 1 ? "1.er intento" : "intento " + l.tries}</span>`).join("");
+  $("starbank").textContent = "★ " + totalStars();
+  if (r >= .6) { tone([523, 659, 784, 1047], .13); confetti(); }
+}
+
+renderHome();
+</script>
+</body>
+</html>
